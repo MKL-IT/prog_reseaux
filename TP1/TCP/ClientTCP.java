@@ -4,7 +4,7 @@
  * Date: 10/01/04
  * Authors:
  */
-package stream;
+package TCP;
 
 import java.io.*;
 import java.net.*;
@@ -19,8 +19,9 @@ public class ClientTCP {
     public static void main(String[] args) throws IOException {
       
       ClientConnectionThread cct = null;
-      Socket echoSocket = null;
+      Socket socket = null;
       BufferedReader stdIn = null;
+
 
       if (args.length != 2) {
         System.out.println("Usage: java ClientTCP <EchoServer host> <EchoServer port>");
@@ -29,8 +30,8 @@ public class ClientTCP {
 
       try {
   	    // creation socket ==> connexion
-  	    echoSocket = new Socket(args[0], new Integer(args[1]).intValue());
-        cct = new ClientConnectionThread(echoSocket);
+  	    socket = new Socket(args[0], new Integer(args[1]).intValue());
+        cct = new ClientConnectionThread(socket);
         cct.start();
 
         stdIn = new BufferedReader(new InputStreamReader(System.in));
@@ -51,14 +52,14 @@ public class ClientTCP {
       	
         line=stdIn.readLine();
 
+        cct.sendToServer(line);
+
       	if (line.equals(".") )
           break;
-
-        cct.sendToServer(line);
       }
 
       stdIn.close();
-      echoSocket.close();
+      socket.close();
   }
 }
 

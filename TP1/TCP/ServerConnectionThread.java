@@ -1,12 +1,16 @@
 
-package stream;
+package TCP;
 
 import java.io.*;
 import java.net.*;
+import history.Message;
+
 
 public class ServerConnectionThread extends Thread {
 	
 	private Socket socket;
+  private String pseudo;
+
   BufferedReader socIn;
   PrintStream socOut;
 	
@@ -15,10 +19,7 @@ public class ServerConnectionThread extends Thread {
 	}
 
 
-  public void deleteClient(){
-
-  }
-
+/*
   public synchronized void sendToClient(String text, int numClient){
 
     try {
@@ -44,6 +45,21 @@ public class ServerConnectionThread extends Thread {
     }
   }
 
+*/
+
+  public void sendMessage(String message) {
+    try {
+      socOut.println(message);
+    } catch (Exception e) {
+          System.err.println("Error in EchoServer:" + e); 
+        }
+  }
+
+  
+  public String getClientAddress () {
+    return socket.getInetAddress().toString();
+  }
+
 	public void run() {
 
     try {
@@ -51,13 +67,40 @@ public class ServerConnectionThread extends Thread {
       socIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));    
       socOut = new PrintStream(socket.getOutputStream());
 
-      while (true) {
-        
-        String line = socIn.readLine();
+      socOut.println("To join enter : join <pseudo>");
 
-        if(line != null)
-          sendToAllClients(line, socket.getPort());
+      while (true) {
+        String line = socIn.readLine();
+        
+        if (line != null){
+          if(line.startsWith("join")) {
+
+            String [] params = line.split(" ");
+          
+            if (params.length == 2) {
+            
+              if (ServerTCP.join(this, params[1])) {
+                pseudo = params[1];
+              }
+            } else {
+              socOut.println("To join enter : join <pseudo>");
+            }
+
+          } else if( (line.equals("leave") || line.equals(".") )&& pseudo != null) {
+            ServerTCP.leave(pseudo);
+
+          } else if (pseudo != null) {
+          
+              Message msg = new Message(pseudo, line);
+              ServerTCP.diffuseMessage(msg);
+            
+          } else {
+            socOut.println("You are not registered");
+          }
+        }
+
       }
+
     } catch (Exception e) {
       System.err.println("Error in ServerConnectionThread:" + e); 
       e.printStackTrace();

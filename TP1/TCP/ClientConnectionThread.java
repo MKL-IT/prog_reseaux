@@ -1,5 +1,5 @@
 
-package stream;
+package TCP;
 
 import java.io.*;
 import java.net.*;
@@ -9,17 +9,12 @@ public class ClientConnectionThread extends Thread {
 	private Socket socket;
   BufferedReader socIn;
   PrintStream socOut = null;
-  boolean go_on ;
 
 	
 	ClientConnectionThread(Socket s) {
-    go_on = true;
 		this.socket = s;
 	}
 
-  public void stopThread(){
-    go_on = false;
-  }
 
   public void sendToServer(String text){
 
@@ -45,7 +40,6 @@ public class ClientConnectionThread extends Thread {
         socOut= new PrintStream(socket.getOutputStream());
 
         while (true) {
-
           String line = socIn.readLine();
           System.out.println(line); 
           

@@ -1,46 +1,153 @@
 /***
  * ServerTCP
+ * Example of a TCP server
  * Date: 10/01/04
- * Authors:
+ * Authors: ESSAYED Sana, MATOKA Lea
  */
 
-package stream;
+package TCP;
 
-import java.io.*;
 import java.net.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import history.*;
 
-public class ServerTCP {
+public class ServerTCP  {
+	
+
+    private static HashMap<String, ServerConnectionThread> connections = new HashMap<String, ServerConnectionThread>();
+
+	private static List<Message> msg_history = new ArrayList<Message>();
+	protected static PersistHistory persist = new PersistHistory("history");
   
-  
-  public static ArrayList<ServerConnectionThread> connections = new ArrayList<ServerConnectionThread>();
-          
-  public static void main(String args[]){ 
-    
-    ServerSocket listenSocket;
+ 	/**
+  	* main method ServerTCP 
+	* @param port 
+  	* 
+  	**/
+    public static void main(String args[]){ 
 
-  	if (args.length != 1) {
-          System.out.println("Usage: java ServerTCP <ServerTCP port>");
-          System.exit(1);
-  	}
+        ServerSocket listenSocket;
+        
+	  	if (args.length != 1) {
+	        System.out.println("Usage: java ServerTCP <ServerTCP port>");
+	        System.exit(1);
+	  	}
 
-    try {
+        persist.createHistoryFile();
+        loadMessagesFromHistoryFile();
 
-      listenSocket = new ServerSocket(Integer.parseInt(args[0])); //port
-      System.out.println("Server ready..."); 
+		try {
+			listenSocket = new ServerSocket(Integer.parseInt(args[0])); //port
 
-      while (true) {
-        Socket socket = listenSocket.accept();
-        System.out.println("Connexion from:" + socket.getInetAddress());
-        ServerConnectionThread sct = new ServerConnectionThread(socket);
-        sct.start();
-        connections.add(sct);
-      }
-    } catch (Exception e) {
-        System.err.println("Error in ServerTCP:" + e);
-        e.printStackTrace();
+			System.out.println("Server ready...");
+
+			while (true) {
+				Socket socket = listenSocket.accept();
+                System.out.println("Connexion from:" + socket.getInetAddress());
+                ServerConnectionThread sct = new ServerConnectionThread(socket);
+                sct.start();
+			}
+
+        } catch (Exception e) {
+            System.err.println("Error in ServerTCP:" + e);
+            e.printStackTrace();
+        }
     }
-  }	
+
+
+    /**
+    * method join
+    * @param sct ServerConnectionThread
+    * @param pseudo
+    *
+    *
+    **/   
+    public static synchronized boolean join(ServerConnectionThread sct, String pseudo) {
+    	
+        if(connections.containsKey(pseudo)){
+    		
+            //System.out.println("User " + pseudo + " already exist");
+    		sct.sendMessage("User " + pseudo + " already exists");
+    		return false;
+
+    	} else {
+    		//System.out.println(pseudo + " joined the server with adress : " + sct.getClientAddress());
+        	
+            connections.put(pseudo, sct);
+
+        	Message msg = new Message(pseudo,pseudo + " joined the server");
+        	welcomeUser(pseudo);
+        	diffuseTempMessage(msg);
+
+        	return true;
+    	}
+    }
+    
+    /**
+    * method leave
+    * @param pseudo
+    * 
+    *
+    **/ 
+    public static synchronized void leave(String pseudo) {
+    	System.out.println("A user has left the server : " + connections.get(pseudo).getClientAddress() ); 
+    	Message msg = new Message(pseudo,pseudo + " left the server");
+    	diffuseTempMessage(msg);
+    	connections.remove(pseudo);
+    }
+
+
+
+    public static synchronized void diffuseMessage(Message message) {
+
+    	if(connections.containsKey(message.getUser())){
+    		msg_history.add(message);
+    		writeMessageToHistoryFile(message);
+    		sendMessageClients(message.getMessage());
+    	}
+    }
+    
+    public static synchronized void diffuseTempMessage(Message message){
+    	if(connections.containsKey(message.getUser())){
+    		sendMessageClients(message.getMessageOnly());
+    	}
+    }
+    
+    public static void welcomeUser(String user) {
+    	ServerConnectionThread sct = connections.get(user);
+    	if (sct!=null) {
+    		sct.sendMessage("Welcome to the server ! You are now talking with " + (connections.size() - 1) + " people");
+        	for(Message m : msg_history){
+            	sct.sendMessage(m.getMessage());
+            }
+    	}
+    }
+    
+    //public static synchronized void diffuseMessage(String message) {
+    	//System.out.println("New message : " + message); 
+    	//sendMessageClients(message);
+    //}
+    
+    public static void sendMessageClients(String message) {
+    	for(ServerConnectionThread sct : connections.values()){
+        	sct.sendMessage(message);
+        }
+    }
+    
+    public static void writeMessageToHistoryFile (Message message) {
+    	persist.appendToHistoryFile(message.toString());
+    }
+    
+    public static void loadMessagesFromHistoryFile () {
+    	List<String> lines = persist.readFromHistoryFile();
+    	for(String line : lines) {
+    		Message message = new Message (line);
+    		msg_history.add(message);
+    	}
+    }
+    
 }
 
   
