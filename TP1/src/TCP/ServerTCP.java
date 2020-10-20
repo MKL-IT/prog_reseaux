@@ -1,8 +1,8 @@
 /***
  * ServerTCP
- * Example of a TCP server
- * Date: 10/01/04
- * Authors: ESSAYED Sana, MATOKA Lea
+ * Exemple serveur TCP
+ * Date: 20/10/2020
+ * @author: B3-10 / ESSAYED Sana, MATOKA Lea
  */
 
 package TCP;
@@ -24,7 +24,6 @@ public class ServerTCP  {
  	/**
   	* main method ServerTCP 
 	* @param port 
-  	* 
   	**/
     public static void main(String args[]){ 
 
@@ -58,11 +57,9 @@ public class ServerTCP  {
 
 
     /**
-    * method join
+    * methode join
     * @param sct ServerConnectionThread
-    * @param pseudo
-    *
-    *
+    * @param pseudo 
     **/   
     public static synchronized boolean join(ServerConnectionThread sct, String pseudo) {
     	
@@ -86,10 +83,8 @@ public class ServerTCP  {
     }
     
     /**
-    * method leave
-    * @param pseudo
-    * 
-    *
+    * methode leave
+    * @param pseudo 
     **/ 
     public static synchronized void leave(String pseudo) {
     	System.out.println("A user has left the server : " + connections.get(pseudo).getClientAddress() ); 
@@ -99,7 +94,10 @@ public class ServerTCP  {
     }
 
 
-
+    /**
+    * methode diffuseMessage
+    * @param message 
+    **/
     public static synchronized void diffuseMessage(Message message) {
 
     	if(connections.containsKey(message.getUser())){
@@ -109,12 +107,20 @@ public class ServerTCP  {
     	}
     }
     
+    /**
+    * method diffuseTempMessage
+    * @param message 
+    **/
     public static synchronized void diffuseTempMessage(Message message){
     	if(connections.containsKey(message.getUser())){
     		sendMessageClients(message.getMessageOnly());
     	}
     }
     
+    /**
+    * method welcomeUser
+    * @param user 
+    **/
     public static void welcomeUser(String user) {
     	ServerConnectionThread sct = connections.get(user);
     	if (sct!=null) {
@@ -130,16 +136,27 @@ public class ServerTCP  {
     	//sendMessageClients(message);
     //}
     
+    /**
+    * methode sendMessageClients
+    * @param message 
+    **/
     public static void sendMessageClients(String message) {
     	for(ServerConnectionThread sct : connections.values()){
         	sct.sendMessage(message);
         }
     }
     
+    /**
+    * methode writeMessageToHistoryFile
+    * @param message 
+    **/
     public static void writeMessageToHistoryFile (Message message) {
     	persist.appendToHistoryFile(message.toString());
     }
     
+    /**
+    * methode loadMessagesFromHistoryFile
+    **/
     public static void loadMessagesFromHistoryFile () {
     	List<String> lines = persist.readFromHistoryFile();
     	for(String line : lines) {
