@@ -1,3 +1,11 @@
+/***
+ * MulticastClient
+ * Exemple serveur UDP
+ * Date: 20/10/2020
+ * @author: B3-10 / ESSAYED Sana, MATOKA Lea
+ */
+
+
 package stream;
 
 import java.io.*;
@@ -6,7 +14,11 @@ import java.net.*;
 
 public class MulticastClient  {
 
-
+  /**
+  * methode main
+  * @param host
+  * @param port
+  **/
 	public static void main(String[] args) throws IOException {
 
 
