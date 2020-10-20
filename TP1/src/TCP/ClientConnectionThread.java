@@ -1,3 +1,10 @@
+/***
+ * ClientConnexionThread
+ * Exemple serveur TCP
+ * Date: 20/10/2020
+ * @author: B3-10 / ESSAYED Sana, MATOKA Lea
+ ***/
+
 
 package TCP;
 
@@ -10,12 +17,18 @@ public class ClientConnectionThread extends Thread {
   BufferedReader socIn;
   PrintStream socOut = null;
 
-	
+	/**
+  * constructeur ClientConnectionThread
+  * @param s Socket
+  **/
 	ClientConnectionThread(Socket s) {
 		this.socket = s;
 	}
 
-
+  /**
+  * methode sendToServer
+  * @param text
+  **/
   public void sendToServer(String text){
 
     try {
@@ -29,7 +42,9 @@ public class ClientConnectionThread extends Thread {
     }
   }
 
-
+  /**
+  * methode run
+  **/
 	public void run() {
 
     try {
