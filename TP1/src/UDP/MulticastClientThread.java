@@ -5,7 +5,7 @@
  * @author: B3-10 / ESSAYED Sana, MATOKA Lea
  */
 
-package stream;
+package UDP;
 
 import java.io.*;
 import java.net.*;
@@ -24,15 +24,9 @@ public class MulticastClientThread extends Thread {
     go_on = true;
 	}
 
-  /*public void interrupt() {
-      super.interrupt();
-      try {
-        multiSocket.close(); // Fermeture du flux si l'interruption n'a pas fonctionné.
-      } catch (SocketException se) {}
-  }*/
 
  	/**
-  * receives a request from client then sends an echo to the client
+  * reception d'un message et affichage sur le terminal
   * @param clientSocket the client socket
   **/
 	public void run() {
@@ -49,7 +43,8 @@ public class MulticastClientThread extends Thread {
           multiSocket.receive(recv);
 
           // Print the response
-          System.out.println(new String(buf));
+          String msg = new String(buf);
+          System.out.println("-> "+msg);
           
   		  }
 
@@ -58,6 +53,7 @@ public class MulticastClientThread extends Thread {
 
     	} catch (Exception e) {
         	System.err.println("Error in EchoServer:" + e); 
+          e.printStackTrace();
       }
   }
   
