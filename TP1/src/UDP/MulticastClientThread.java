@@ -1,8 +1,8 @@
 /***
- * ClientThread
- * Example of a TCP server
- * Date: 14/12/08
- * Authors:
+ * MulticastClientThread
+ * Exemple serveur UDP
+ * Date: 20/10/2020
+ * @author: B3-10 / ESSAYED Sana, MATOKA Lea
  */
 
 package stream;
@@ -15,6 +15,10 @@ public class MulticastClientThread extends Thread {
 	private MulticastSocket multiSocket;
   boolean go_on;
 	
+  /**
+  * constructeur MulticastClientThread
+  * @param ms MulticasSocket
+  **/
 	MulticastClientThread (MulticastSocket ms) {
 		this.multiSocket = ms;
     go_on = true;
@@ -28,9 +32,9 @@ public class MulticastClientThread extends Thread {
   }*/
 
  	/**
-  	* receives a request from client then sends an echo to the client
-  	* @param clientSocket the client socket
-  	**/
+  * receives a request from client then sends an echo to the client
+  * @param clientSocket the client socket
+  **/
 	public void run() {
   	  try {
     		
