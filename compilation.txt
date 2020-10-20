@@ -1,0 +1,34 @@
+
+TP1
+
+
+//compilation
+javac -d classes src/*/*.java
+
+
+//exe
+
+//TCP
+
+-> server
+java -classpath classes TCP.ServerTCP 5000
+
+
+-> client
+java -classpath classes TCP.ClientTCP localhost 5000
+
+
+//UDP
+java -classpath classes UDP.MulticastClient 228.5.6.7 6789
+
+
+
+TP2
+
+//compilation
+javac -d classes src/*/*/*.java
+
+
+//exe
+java -classpath classes http.server.WebServer
+
