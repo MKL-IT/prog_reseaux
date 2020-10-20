@@ -1,3 +1,9 @@
+/***
+ * ServerConnectionThread
+ * Exemple serveur TCP
+ * Date: 20/10/2020
+ * @author: B3-10 / ESSAYED Sana, MATOKA Lea
+ */
 
 package TCP;
 
@@ -14,6 +20,10 @@ public class ServerConnectionThread extends Thread {
   BufferedReader socIn;
   PrintStream socOut;
 	
+  /**
+  * constructeur ServerConnectionThread
+  * @param s Socket
+  **/
 	ServerConnectionThread(Socket s) {
 		this.socket = s;
 	}
@@ -47,6 +57,10 @@ public class ServerConnectionThread extends Thread {
 
 */
 
+  /**
+  * methode sendMessage
+  * @param message
+  **/
   public void sendMessage(String message) {
     try {
       socOut.println(message);
@@ -55,11 +69,17 @@ public class ServerConnectionThread extends Thread {
         }
   }
 
-  
+  /**
+  * methode getClientAddress
+  **/
   public String getClientAddress () {
     return socket.getInetAddress().toString();
   }
 
+  /**
+  * methode run
+  * @param pseudo
+  **/
 	public void run() {
 
     try {
