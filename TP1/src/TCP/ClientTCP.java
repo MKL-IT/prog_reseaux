@@ -1,9 +1,10 @@
 /***
- * EchoClient
- * Example of a TCP client 
- * Date: 10/01/04
- * Authors:
- */
+ * ClientTCP
+ * Exemple serveur TCP
+ * Date: 20/10/2020
+ * @author: B3-10 / ESSAYED Sana, MATOKA Lea
+ ***/
+
 package TCP;
 
 import java.io.*;
@@ -12,10 +13,12 @@ import java.net.*;
 
 public class ClientTCP {
 
-  /**
-  *  main method
-  *  accepts a connection, receives a message from client then sends an echo to the client
-  **/
+    /**
+    * main method
+    * accepts a connection, receives a message from client then sends an echo to the client
+    * @param host
+    * @param port
+    **/
     public static void main(String[] args) throws IOException {
       
       ClientConnectionThread cct = null;
