@@ -36,37 +36,51 @@ public class ServerThread extends Thread {
 
 
         try {
-            BufferedReader in = new BufferedReader(new InputStreamReader(
-                    socket.getInputStream()));
+            BufferedInputStream in = new BufferedInputStream( socket.getInputStream() );
             BufferedOutputStream out = new BufferedOutputStream(socket.getOutputStream());
 
             
             while(true) {
-                //Gérer la requête
-                Request request = new Request(in);
-                request.readRequest();
-                System.out.println(request.getMethod());
-                System.out.println(request.getUri());
 
-                switch (request.getMethod()) {
-                    case "GET":
-                        httpGET(out, request.getUri());
-                        break;
-                    case "POST":
-                        httpPOST(out, in, request.getUri());
-                        break;
-                    case "PUT":
-                        //
-                        break;
-                    case "HEAD":
-                        //
-                        break;
-                    case "DELETE":
-                        httpDELETE(out, request.getUri(), request.getFields() );
-                        break;
-                    default:
-                        break;
-            }
+                //Gérer la requête
+                Request request = null;
+                request = new Request(in);
+                request.readRequest();
+
+                
+
+                if(request != null){
+
+                    System.out.println(request.getMethod());
+                    System.out.println(request.getUri());
+
+                    switch (request.getMethod()) {
+
+                        case "GET":
+                            methodGET(out, request.getUri());
+                            break;
+
+                        case "HEAD":
+                            methodHEAD(out, request.getUri());
+                            break;
+
+                        case "POST":
+                            methodPOST(out, in, request.getUri());
+                            break;
+
+                        case "PUT":
+                            methodPUT(out, in, request.getUri());
+                            break;
+                    
+                        case "DELETE":
+                            methodDELETE(out, request.getUri(), request.getFields() );
+                            break;
+
+                        default:
+                            break;
+                    }
+                
+                }
              
             
             }
@@ -78,13 +92,13 @@ public class ServerThread extends Thread {
         }
     }
 
-    private void httpGET(BufferedOutputStream out, String request_uri) {
+    private void methodGET(BufferedOutputStream out, String request_uri) {
         //Répond à une requete GET
         File file = new File(request_uri);
         BufferedReader reader = null;
+
         String code = null;
         String toSend = new String();
-        boolean success = false;
         
         
         
@@ -93,10 +107,8 @@ public class ServerThread extends Thread {
             int cur = '\0';
 
             while ((cur = reader.read()) != -1) {
-                toSend += (char) cur;
             }
             code = "200 OK";
-            success = true;
             
         } catch (FileNotFoundException ex) {
             System.err.println("Error in httpGET: " + ex);
@@ -127,14 +139,14 @@ public class ServerThread extends Thread {
 
             case "404 Not Found":
                 type = "Content-Type: text/html\r\n";
-                length = (long) notFound.length();
-                toSend = notFound;
+                length = (long) NOTFOUND.length();
+                toSend = NOTFOUND;
                 break;
             
             case "403 Forbidden":
                 type = "Content-Type: text/html\r\n";
-                length = (long) forbidden.length();
-                toSend = forbidden;
+                length = (long) FORBIDDEN.length();
+                toSend = FORBIDDEN;
                 break;
                 
             
@@ -144,7 +156,25 @@ public class ServerThread extends Thread {
 
         try {
             out.write(makeHeader(code, type, length).getBytes());
-            out.write(toSend.getBytes());
+
+            if ( code == "200 OK"){
+
+                // Ouverture d'un flux de lecture binaire sur le fichier demand�
+                BufferedInputStream fileIn = new BufferedInputStream(new FileInputStream(file));
+                // Envoi du corps : le fichier (page HTML, image, vidéo...)
+                byte[] buffer = new byte[256];
+                int nbRead;
+                while((nbRead = fileIn.read(buffer)) != -1) {
+                    out.write(buffer, 0, nbRead);
+                }
+                // Fermeture du flux de lecture
+                fileIn.close();
+
+            }else{
+                out.write(toSend.getBytes());
+            }
+            
+            //envoi de la réponse
             out.flush();
         } catch (IOException ex) {
             System.err.println("Error in httpGET: " + ex);
@@ -152,6 +182,303 @@ public class ServerThread extends Thread {
         }
 
     }
+
+
+
+    private void methodHEAD(BufferedOutputStream out, String request_uri) {
+        
+
+        //Réponse à une requête HEAD
+
+        File file = new File(request_uri);
+        BufferedReader reader = null;
+        String code = null;
+               
+        
+        try {
+            reader = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
+            
+            int cur = ' ';
+
+            while ((cur = reader.read()) != -1) {
+            }
+            code = "200 OK";
+            
+        } catch (FileNotFoundException ex) {
+            System.err.println("Error in methodGET: " + ex);
+            ex.printStackTrace();
+            
+            if(file.isFile()) {
+                code = "403 Forbidden";
+            } else {
+                code = "404 Not Found";
+            }
+
+        } catch (IOException ex) {
+            System.err.println("Error in methodGET: " + ex);
+            code = "404 Not Found";
+            ex.printStackTrace();
+        }
+
+        String type = "";
+        long length = 0;
+
+        switch (code) {
+
+            case "200 OK":
+                type = getContentType(file);
+                length = file.length();
+
+                break;
+
+            case "404 Not Found":
+                type = "Content-Type: text/html\r\n";
+                length = (long) NOTFOUND.length();
+                break;
+            
+            case "403 Forbidden":
+                type = "Content-Type: text/html\r\n";
+                length = (long) FORBIDDEN.length();
+                break;
+                
+            
+            default:
+                break;
+        }
+
+        try {
+            out.write(makeHeader(code, type, length).getBytes());
+            out.flush();
+        } catch (IOException ex) {
+            System.err.println("Error in httpGET: " + ex);
+            ex.printStackTrace();
+        }
+
+    }
+
+
+     private void methodPOST(BufferedOutputStream out, BufferedInputStream in, String request_uri) {
+        
+        try {
+
+            File src = new File(request_uri);
+            boolean create = src.createNewFile();
+            
+
+            BufferedOutputStream bufOut = new BufferedOutputStream(new FileOutputStream(src, src.exists()));
+
+            byte[] buffer = new byte[256];
+            while(in.available() > 0) {
+                int nbRead = in.read(buffer);
+                bufOut.write(buffer, 0, nbRead);
+            }
+            bufOut.flush();
+            bufOut.close();
+            
+            if (create) {
+                out.write(makeHeader("201 Created").getBytes());
+                out.write("\r\n".getBytes());
+            } else {
+                out.write(makeHeader("200 OK").getBytes());
+                out.write("\r\n".getBytes());
+            }
+            
+            // envoi de la réponse
+            out.flush();
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+            try {
+                out.write(makeHeader("500 Internal Server Error").getBytes());
+                //out.write("\r\n".getBytes());
+                out.flush();
+
+            } catch (Exception e2) {
+                System.out.println(e);
+                e2.printStackTrace();
+            }
+        }
+    }
+
+
+    private void methodPUT(BufferedOutputStream out, BufferedInputStream in, String request_uri) {
+
+        try {
+            File src = new File(request_uri);
+            if (!src.createNewFile()){
+                PrintWriter pw = new PrintWriter(src);
+                pw.close();
+            }
+            
+            BufferedOutputStream bufOut = new BufferedOutputStream(new FileOutputStream(src, src.exists()));
+
+            byte[] buffer = new byte[256];
+            while(in.available() > 0) {
+                int nbRead = in.read(buffer);
+                bufOut.write(buffer, 0, nbRead);
+            }
+
+            bufOut.flush();
+            bufOut.close();
+
+            if (src.createNewFile()) {
+                out.write(makeHeader("204 No Content").getBytes());
+                out.write("\r\n".getBytes());
+            } else {
+                out.write(makeHeader("201 Created").getBytes());
+                out.write("\r\n".getBytes());
+            }
+
+            //envoi de la réponse
+            out.flush();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            try {
+                out.write(makeHeader("500 Internal Server Error").getBytes());
+                out.write("\r\n".getBytes());
+                out.flush();
+            } catch (Exception e2) {
+                System.out.println(e);
+            }
+
+        }
+    }
+    
+    private void methodDELETE(BufferedOutputStream out, String request_uri, ArrayList<String> fields) {
+        
+        //Répond à une requete DELETE
+        File file = new File(request_uri);
+        BufferedReader reader = null;
+       
+       
+        String code = null;
+        String toSend = new String();
+ 
+        try {
+            reader = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
+            int cur = '\0';
+        
+            
+            while ((cur = reader.read()) != -1 ) {
+            }
+
+            file.delete();
+
+            if( fields.size() > 0){
+                // action a été confirmée et que le message de réponse
+                // inclut une représentation décrivant le statut
+                code = "200 OK";
+            }else{
+                // action a été confirmée et qu'aucune information supplémentaire n'est à fournir
+                code = "204 No Content";
+            }
+                  
+            
+        } catch (FileNotFoundException ex) {
+            System.err.println("Error in httpGET: " + ex);
+            ex.printStackTrace();
+            
+            if(file.isFile()) {
+                // client n'a pas les droits d'accès au contenu
+                code = "403 Forbidden";
+            } else {
+                // serveur n'a pas trouvé la ressource demandée
+                code = "404 Not Found";
+            }
+
+        } catch (IOException ex) {
+            System.err.println("Error in httpGET: " + ex);
+            code = "404 Not Found";
+            ex.printStackTrace();
+        }
+
+        String type = "";
+        long length = 0;
+
+        switch (code) {
+
+            
+            case "200 OK":
+                type = "Content-Type: text/html\r\n";
+                length = (long) DELETED.length();
+                toSend = DELETED;
+                break;
+
+            case "204 No Content":
+                type = "Content-Type: text/html\r\n";
+                length = (long) DELETED.length();
+                toSend = DELETED;
+                break;
+
+            case "404 Not Found":
+                type = "Content-Type: text/html\r\n";
+                length = (long) NOTFOUND.length();
+                toSend = NOTFOUND;
+                break;
+            
+            case "403 Forbidden":
+                type = "Content-Type: text/html\r\n";
+                length = (long) FORBIDDEN.length();
+                toSend = FORBIDDEN;
+                break;
+                
+            
+            default:
+                break;
+        }
+
+        try {
+
+            if ( code == "204 No Content"){
+                out.write(makeHeader(code).getBytes());
+            }else{
+                out.write(makeHeader(code, type, length).getBytes());
+                out.write(toSend.getBytes());
+            }
+            
+            out.flush();
+
+        } catch (IOException ex) {
+            System.err.println("Error in httpGET: " + ex);
+            ex.printStackTrace();
+        }
+
+    }
+    
+
+
+    public String getContentType(File file) {
+
+        String fileName = file.getName();
+        String type = ".txt";
+
+        if (fileName.endsWith(".html") || fileName.endsWith(".htm") || fileName.endsWith(".txt")) {
+            type = "Content-Type: text/html\r\n";
+        } else if (fileName.endsWith(".mp4")) {
+            type = "Content-Type: video/mp4\r\n";
+        } else if (fileName.endsWith(".png")) {
+            type = "Content-Type: image/png\r\n";
+        } else if (fileName.endsWith(".jpeg") || fileName.endsWith(".jpg")) {
+            type = "Content-Type: image/jpeg\r\n";
+        } else if (fileName.endsWith(".mp3")) {
+            type = "Content-Type: audio/mp3\r\n";
+        } else if (fileName.endsWith(".avi")) {
+            type = "Content-Type: video/x-msvideo\r\n";
+        } else if (fileName.endsWith(".css")) {
+            type = "Content-Type: text/css\r\n";
+        } else if (fileName.endsWith(".pdf")) {
+            type = "Content-Type: application/pdf\r\n";
+        } else if (fileName.endsWith(".odt")) {
+            type = "Content-Type: application/vnd.oasis.opendocument.text\r\n";
+        } else if (fileName.endsWith(".json")) {
+            type = "Content-Type: application/json\r\n";
+        }
+
+        return type;
+    }
+
 
     private String makeHeader(String code, String type, long length) {
 
@@ -171,257 +498,18 @@ public class ServerThread extends Thread {
         header += "\r\n";
         return header;
     }
-
-    private void httpPOST(BufferedOutputStream out, BufferedReader in, String request_uri) {
-        try {
-            File resource = new File(request_uri);
-            boolean newFile = resource.createNewFile();
-
-
-            BufferedOutputStream fileOut = new BufferedOutputStream(new FileOutputStream(resource, resource.exists()));
-
-            byte[] buffer = new byte[1024];
-            String lineBody = in.readLine();
-            while (lineBody != null && !lineBody.equals("")) {
-                System.out.println("line :" + lineBody);
-                lineBody = in.readLine();
-                fileOut.write(lineBody.getBytes(), 0, lineBody.getBytes().length);
-                fileOut.write("\r\n".getBytes(), 0, "\r\n".getBytes().length);
-                lineBody = in.readLine();
-            }
-            fileOut.flush();
-            fileOut.close();
-
-            if (newFile) {
-                out.write(makeHeader("201 Created").getBytes());
-                out.write("\r\n".getBytes());
-            } else {
-                out.write(makeHeader("200 OK").getBytes());
-                out.write("\r\n".getBytes());
-            }
-            out.flush();
-        } catch (Exception e) {
-            e.printStackTrace();
-            try {
-                out.write(makeHeader("500 Internal Server Error").getBytes());
-                out.write("\r\n".getBytes());
-                out.flush();
-            } catch (Exception e2) {
-                System.out.println(e);
-            }
-
-        }
-    }
-    
-    private void httpDELETE(BufferedOutputStream out, String request_uri, ArrayList<String> fields) {
-        
-        //Répond à une requete DELETE
-        File file = new File(request_uri);
-        BufferedReader reader = null;
-       
-       
-        String code = null;
-        String toSend = new String();
- 
-        try {
-            reader = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
-            int cur = '\0', stop = 1;
-        
-            
-            while ((cur = reader.read()) != -1  && stop < 3) {
-                toSend += (char) cur;
-                stop++;
-            }
-            code = "200 OK";
-            
-        } catch (FileNotFoundException ex) {
-            System.err.println("Error in httpGET: " + ex);
-            ex.printStackTrace();
-            
-            if(file.isFile()) {
-                code = "403 Forbidden";
-            } else {
-                code = "404 Not Found";
-            }
-
-        } catch (IOException ex) {
-            System.err.println("Error in httpGET: " + ex);
-            code = "404 Not Found";
-            ex.printStackTrace();
-        }
-
-        String type = "...";
-        long length = 0;
-
-        switch (code) {
-
-            case "200 OK":
-                type = getContentType(file);
-                length = file.length();
-
-                break;
-
-            case "404 Not Found":
-                type = "Content-Type: text/html\r\n";
-                length = (long) notFound.length();
-                toSend = notFound;
-                break;
-            
-            case "403 Forbidden":
-                type = "Content-Type: text/html\r\n";
-                length = (long) forbidden.length();
-                toSend = forbidden;
-                break;
-                
-            
-            default:
-                break;
-        }
-
-        try {
-            out.write(makeHeader(code, type, length).getBytes());
-            out.write(toSend.getBytes());
-            out.flush();
-        } catch (IOException ex) {
-            System.err.println("Error in httpGET: " + ex);
-            ex.printStackTrace();
-        }
-
-    }
     
     
-    public void httpDELETE2(BufferedOutputStream out, String request_uri, ArrayList<String> fields) {
-        //Répond à une requete DELETE
 
-        try{
-
-            File file = new File(request_uri);
-
-            boolean delete = false; // fichier a été supprimé
-            boolean exist = false;  // fichier existe
-            boolean error = false; 
-
-            if((exist = file.exists()) && file.isFile()) {
-                delete = file.delete();
-            }
-
-            String code = null, header = null; // code de retour et entête de la réponse
-
-            if(delete && fields.size() > 0) {
-                // action a été confirmée et que le message de réponse 
-                // inclut une représentation décrivant le statut
-                code = "200 OK";
-                header = makeHeader(code, getContentType(file) , file.length() );
-
-            }else if(delete){
-                
-                // action a été confirmée et qu'aucune information supplémentaire n'est à fournir
-                code = "204 No Content";
-                header = makeHeader(code, getContentType(file) , file.length() );
-
-            } else if (!exist) {
-
-                // serveur n'a pas trouvé la ressource demandée
-                code = "404 Not Found";
-                header = makeHeader(code);
-            } else {
-                // client n'a pas les droits d'accès au contenu
-                code = "403 Forbidden";
-                header = makeHeader(code, getContentType(file) , file.length() );
-            }  
-
-
-        //écriture dans l'output stream
-        out.write(header.getBytes() );
-        
-        System.out.println(header);
-
-        // fichier html
-        if(request_uri.endsWith(".html") || request_uri.endsWith(".htm") && delete ){
-			
-			
-            String body = "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\n"
-            + "<html>\n"
-            + "<head>\n"
-            + "   <title>403 Forbidden</title>\n"
-            + "</head>\n"
-            + "<body>\n"
-            + "   <h1>403 Forbidden</h1>\n"
-            + "   <p>Access is forbidden to the requested page.</p>\n"
-            + "</body>\n"
-            + "</html> ";
-            
-            
-            
-            String b2 =
+    private static final String DELETED =
             "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\n"
             +"<html>\n"
             +"<body>\n"
             +"   <h1>File deleted.</h1>\n"
             +"</body>\n"
             +"</html>";
-			
-			System.out.println(body);
-            out.write(body.getBytes());
-        }
 
-
-        // fichier JSON
-        if(request_uri.endsWith(".json")  && delete){
-
-            String body = "{'success':'true'}";
-            out.write(body.getBytes());
-        }
-
-        //envoie des données
-        out.flush();          
-
-        }catch(Exception e){
-
-            e.printStackTrace();
-            // En cas d'erreur on essaie d'avertir le client
-            try {
-                out.write(makeHeader("500 Internal Server Error").getBytes());
-
-                //envoie des données
-                out.flush(); 
-
-            } catch (Exception e2) {};
-        }          
-    }
-
-    public String getContentType(File file) {
-
-        String fileName = file.getName();
-        String type = ".txt";
-
-        if (fileName.endsWith(".html") || fileName.endsWith(".htm") || fileName.endsWith(".txt")) {
-            type = "Content-Type: text/html\r\n";
-        } else if (fileName.endsWith(".mp4")) {
-            type = "Content-Type: video/mp4\r\n";
-        } else if (fileName.endsWith(".png")) {
-            type = "Content-Type: image/png\r\n";
-        } else if (fileName.endsWith(".jpeg") || fileName.endsWith(".jpg")) {
-            type = "Content-Type: image/jpg\r\n";
-        } else if (fileName.endsWith(".mp3")) {
-            type = "Content-Type: audio/mp3\r\n";
-        } else if (fileName.endsWith(".avi")) {
-            type = "Content-Type: video/x-msvideo\r\n";
-        } else if (fileName.endsWith(".css")) {
-            type = "Content-Type: text/css\r\n";
-        } else if (fileName.endsWith(".pdf")) {
-            type = "Content-Type: application/pdf\r\n";
-        } else if (fileName.endsWith(".odt")) {
-            type = "Content-Type: application/vnd.oasis.opendocument.text\r\n";
-        } else if (fileName.endsWith(".json")) {
-            type = "Content-Type: application/json\r\n";
-        }
-
-        return type;
-    }
-    
-    
-    private static final String notFound = "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\n"
+    private static final String NOTFOUND = "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\n"
             + "<html>\n"
             + "<head>\n"
             + "   <title>404 Not Found</title>\n"
@@ -432,7 +520,7 @@ public class ServerThread extends Thread {
             + "</body>\n"
             + "</html> ";
     
-    private static final String forbidden = "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\n"
+    private static final String FORBIDDEN = "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\n"
             + "<html>\n"
             + "<head>\n"
             + "   <title>403 Forbidden</title>\n"
