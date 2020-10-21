@@ -15,15 +15,15 @@ import java.util.ArrayList;
  */
 public class Request {
 
-    private BufferedReader in;
+    private BufferedInputStream in;
 
     private String method;
     private String uri;
     private String httpVersion;
     private ArrayList<String> fields;
-    private ArrayList<String> body;
+    private String body;
 
-    public Request(BufferedReader input) {
+    public Request(BufferedInputStream input) {
         this.in = input;
     }
 
@@ -99,7 +99,7 @@ public class Request {
         return fields;
     }
 
-    public ArrayList<String> getBody() {
+    public String getBody() {
         return body;
     }
     
