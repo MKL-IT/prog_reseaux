@@ -1,18 +1,15 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+/***
+ * Request
+ * Date: 20/10/2020
+ * @author: B3-10 / ESSAYED Sana, MATOKA Lea
+ ***/
+
 package http.server;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.util.ArrayList;
 
-/**
- *
- * @author lea
- */
 public class Request {
 
     private BufferedInputStream in;
@@ -23,10 +20,17 @@ public class Request {
     private ArrayList<String> fields;
     private String body;
 
+    /**
+    * constructeur d'une requete
+    * @param input
+    **/
     public Request(BufferedInputStream input) {
         this.in = input;
     }
 
+    /**
+    * methode readRequest
+    **/
     public void readRequest() {
         // Lire la requete et remplir les attributs
         // Le header se termine par la séquence \r\n\r\n (CR LF CR LF)
@@ -83,22 +87,37 @@ public class Request {
 
     }
 
+    /**
+    * getter getMethod
+    **/
     public String getMethod() {
         return method;
     }
 
+    /**
+    * getter getUri
+    **/
     public String getUri() {
         return uri;
     }
 
+    /**
+    * getter getHttpVersion
+    **/
     public String getHttpVersion() {
         return httpVersion;
     }
 
+    /**
+    * getter getFields
+    **/
     public ArrayList<String> getFields() {
         return fields;
     }
 
+    /**
+    * getter getBody
+    **/
     public String getBody() {
         return body;
     }
