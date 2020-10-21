@@ -19,6 +19,7 @@ public class ServerConnectionThread extends Thread {
 
   BufferedReader socIn;
   PrintStream socOut;
+  boolean joined;
 	
   /**
   * constructeur ServerConnectionThread
@@ -26,36 +27,9 @@ public class ServerConnectionThread extends Thread {
   **/
 	ServerConnectionThread(Socket s) {
 		this.socket = s;
+    this.joined = false;
 	}
 
-
-/*
-  public synchronized void sendToClient(String text, int numClient){
-
-    try {
-      socOut.println(numClient + " : " +text);
-      
-    } catch (Exception e) {
-        System.err.println("Error in sendToClient:" + e); 
-        e.printStackTrace();
-    }
-    
-  }
-
-  public void sendToAllClients(String text, int numClient){
-
-
-    for(int i = 0; i < ServerTCP.connections.size(); i++){
-      ServerConnectionThread sct = ServerTCP.connections.get(i);
-
-      if ( sct.socket.isConnected() ){
-        sct.sendToClient(text, numClient);
-      }
-      
-    }
-  }
-
-*/
 
   /**
   * methode sendMessage
@@ -76,6 +50,18 @@ public class ServerConnectionThread extends Thread {
     return socket.getInetAddress().toString();
   }
 
+  public boolean isJoined(){
+    return joined;
+  }
+
+  public void joinChat(){
+    joined = true;
+  }
+
+  public void leaveChat(){
+    joined = false;
+  }
+
   /**
   * methode run
   * @param pseudo
@@ -93,7 +79,8 @@ public class ServerConnectionThread extends Thread {
         String line = socIn.readLine();
         
         if (line != null){
-          if(line.startsWith("join")) {
+
+          if(line.startsWith("join") && !isJoined()) {
 
             String [] params = line.split(" ");
           
@@ -106,9 +93,14 @@ public class ServerConnectionThread extends Thread {
               socOut.println("To join enter : join <pseudo>");
             }
 
-          } else if( (line.equals("leave") || line.equals(".") )&& pseudo != null) {
+          } else if( (line.equals("leave") )&& pseudo != null) {
             ServerTCP.leave(pseudo);
+            leaveChat();
 
+          }else if (line.equals(".")){
+            ServerTCP.leave(pseudo);
+            break;
+            
           } else if (pseudo != null) {
           
               Message msg = new Message(pseudo, line);

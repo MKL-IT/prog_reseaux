@@ -13,9 +13,9 @@ import java.util.HashMap;
 import java.util.List;
 import history.*;
 
+
 public class ServerTCP  {
 	
-
     private static HashMap<String, ServerConnectionThread> connections = new HashMap<String, ServerConnectionThread>();
 
 	private static List<Message> msg_history = new ArrayList<Message>();
@@ -75,6 +75,8 @@ public class ServerTCP  {
             connections.put(pseudo, sct);
 
         	Message msg = new Message(pseudo,pseudo + " joined the server");
+            sct.joinChat();
+
         	welcomeUser(pseudo);
         	diffuseTempMessage(msg);
 
@@ -87,10 +89,13 @@ public class ServerTCP  {
     * @param pseudo 
     **/ 
     public static synchronized void leave(String pseudo) {
-    	System.out.println("A user has left the server : " + connections.get(pseudo).getClientAddress() ); 
-    	Message msg = new Message(pseudo,pseudo + " left the server");
-    	diffuseTempMessage(msg);
-    	connections.remove(pseudo);
+
+        if(connections.containsKey(pseudo)){
+        	System.out.println("A user has left the server : " + connections.get(pseudo).getClientAddress() ); 
+        	Message msg = new Message(pseudo,pseudo + " left the server");
+        	diffuseTempMessage(msg);
+        	connections.remove(pseudo);
+        }
     }
 
 
@@ -130,11 +135,6 @@ public class ServerTCP  {
             }
     	}
     }
-    
-    //public static synchronized void diffuseMessage(String message) {
-    	//System.out.println("New message : " + message); 
-    	//sendMessageClients(message);
-    //}
     
     /**
     * methode sendMessageClients
