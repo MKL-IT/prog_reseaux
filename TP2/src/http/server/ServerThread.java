@@ -221,7 +221,7 @@ public class ServerThread extends Thread {
             code = "200 OK";
             
         } catch (FileNotFoundException ex) {
-            System.err.println("Error in methodGET: " + ex);
+            System.err.println("Error in methodHEAD: " + ex);
             ex.printStackTrace();
             
             if(file.isFile()) {
@@ -231,7 +231,7 @@ public class ServerThread extends Thread {
             }
 
         } catch (IOException ex) {
-            System.err.println("Error in methodGET: " + ex);
+            System.err.println("Error in methodHEAD: " + ex);
             code = "404 Not Found";
             ex.printStackTrace();
         }
@@ -414,7 +414,7 @@ public class ServerThread extends Thread {
                   
             
         } catch (FileNotFoundException ex) {
-            System.err.println("Error in httpGET: " + ex);
+            System.err.println("Error in httpDELETE: " + ex);
             ex.printStackTrace();
             
             if(file.isFile()) {
@@ -426,7 +426,7 @@ public class ServerThread extends Thread {
             }
 
         } catch (IOException ex) {
-            System.err.println("Error in httpGET: " + ex);
+            System.err.println("Error in httpDELETE: " + ex);
             code = "404 Not Found";
             ex.printStackTrace();
         }
@@ -478,7 +478,7 @@ public class ServerThread extends Thread {
             out.flush();
 
         } catch (IOException ex) {
-            System.err.println("Error in httpGET: " + ex);
+            System.err.println("Error in httpDELETE: " + ex);
             ex.printStackTrace();
         }
 
