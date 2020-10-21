@@ -1,8 +1,9 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+/***
+ * WebServer
+ * Date: 20/10/2020
+ * @author: B3-10 / ESSAYED Sana, MATOKA Lea
+ ***/
+
 package http.server;
 
 import java.io.BufferedReader;
@@ -11,12 +12,12 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-/**
- *
- * @author lea 
- */
 public class WebServer {
 
+    /**
+    * methode main
+    * @param port
+    **/
     public static void main(String args[]) {
         ServerSocket s = null;
 
