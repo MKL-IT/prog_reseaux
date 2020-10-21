@@ -26,7 +26,7 @@ public class WebServer {
         }
 
         System.out.println("Webserver starting up on port " + args[0]);
-        System.out.println("(press ctrl-c to exit");
+        System.out.println("(press ctrl-c to exit)");
 
         try {
             // create the main server socket
