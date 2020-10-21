@@ -1,8 +1,9 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+/***
+ * ServerThread
+ * Date: 20/10/2020
+ * @author: B3-10 / ESSAYED Sana, MATOKA Lea
+ ***/
+
 package http.server;
 
 import java.io.BufferedInputStream;
@@ -20,18 +21,21 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.ArrayList;
 
-/**
- *
- * @author lea
- */
 public class ServerThread extends Thread {
 
     private Socket socket;
 
+    /**
+    * constructeur ServerThread
+    * @param s
+    **/
     public ServerThread(Socket s) {
         this.socket = s;
     }
 
+    /**
+    * methode run
+    **/
     public void run() {
 
 
@@ -92,6 +96,13 @@ public class ServerThread extends Thread {
         }
     }
 
+    /**
+    * methode methodGET
+    * @param out
+    * @param request_uri
+    * HTTP GET demande une représentation de la ressource spécifiée. 
+    * HTTP GET doit être utilisée pour récupérer des données.
+    **/
     private void methodGET(BufferedOutputStream out, String request_uri) {
         //Répond à une requete GET
         File file = new File(request_uri);
@@ -184,7 +195,12 @@ public class ServerThread extends Thread {
     }
 
 
-
+    /**
+    * methode methodHEAD
+    * @param out
+    * @param request_uri
+    * HTTP HEAD demande une réponse identique à une requête GET pour laquelle on aura omis le corps de la réponse (on a uniquement l'en-tête).
+    **/
     private void methodHEAD(BufferedOutputStream out, String request_uri) {
         
 
@@ -256,7 +272,15 @@ public class ServerThread extends Thread {
 
     }
 
-
+    /**
+    * methode methodPOST
+    * @param out
+    * @param in
+    * @param request_uri
+    * HTTP POST envoie des données au serveur.
+    * HTTP POST envoie une entité vers la ressource indiquée. 
+    * Cela  entraîne généralement un changement d'état ou des effets de bord sur le serveur.
+    **/
      private void methodPOST(BufferedOutputStream out, BufferedInputStream in, String request_uri) {
         
         try {
@@ -301,7 +325,13 @@ public class ServerThread extends Thread {
         }
     }
 
-
+    /**
+    * methode methodPUT
+    * @param out
+    * @param in
+    * @param request_uri
+    * HTTP PUT remplace toutes les représentations actuelles de la ressource visée par le contenu de la requête.
+    **/
     private void methodPUT(BufferedOutputStream out, BufferedInputStream in, String request_uri) {
 
         try {
@@ -346,6 +376,13 @@ public class ServerThread extends Thread {
         }
     }
     
+    /**
+    * methode methodDELETE
+    * @param out
+    * @param request_uri
+    * @param fields
+    * HTTP DELETE supprime la ressource indiquée.
+    **/
     private void methodDELETE(BufferedOutputStream out, String request_uri, ArrayList<String> fields) {
         
         //Répond à une requete DELETE
@@ -448,7 +485,10 @@ public class ServerThread extends Thread {
     }
     
 
-
+    /**
+    * methode getContentType
+    * @param file
+    **/
     public String getContentType(File file) {
 
         String fileName = file.getName();
@@ -479,7 +519,12 @@ public class ServerThread extends Thread {
         return type;
     }
 
-
+    /**
+    * methode makeHeader
+    * @param code
+    * @param type
+    * @param length
+    **/
     private String makeHeader(String code, String type, long length) {
 
         String header;
@@ -492,6 +537,10 @@ public class ServerThread extends Thread {
         return header;
     }
 
+    /**
+    * methode makeHeader
+    * @param code
+    **/
     private String makeHeader(String code) {
         String header = "HTTP/1.1 " + code + "\r\n";
         header += "Server: Mini WebServer\r\n";
