@@ -1,3 +1,8 @@
+/***
+ * PersistHistory
+ * Date: 20/10/2020
+ * @author: B3-10 / ESSAYED Sana, MATOKA Lea
+ ***/
 
 package history;
 
@@ -17,12 +22,19 @@ public class PersistHistory {
 	protected File file;
 	protected String filename;
 	
-
-	// constructor PersistHistory
+	/**
+	* constructor PersistHistory
+	* @param filename
+	**/
 	public PersistHistory(String filename) {
 		this.filename = filename;
 	}
+
 	
+	/**
+	* method createHistoryFile
+	* Création d'un fichier "history" si celui-ci est inexistant
+	**/
 	public boolean createHistoryFile () {
         
         file = new File(filename);
@@ -39,6 +51,11 @@ public class PersistHistory {
         return success;
 	}
 	
+	/**
+	* method appendToHistoryFile
+	* @param line
+	* Ecriture dans le fichier "history"
+	**/
 	public boolean appendToHistoryFile (String line){
 
 		Path filePath = Paths.get(filename);
@@ -52,7 +69,12 @@ public class PersistHistory {
 		}
 		return success;
 	}
-	
+
+
+	/**
+	* readFromHistoryFile
+	* Récupération des messages enregistrés dans le fichier "history"
+	**/
 	public List<String> readFromHistoryFile() {
 
 		Path filePath = Paths.get(filename);

@@ -1,9 +1,9 @@
 /***
- * ClientTCP
- * Exemple serveur TCP
- * Date: 20/10/2020
- * @author: B3-10 / ESSAYED Sana, MATOKA Lea
- ***/
+* ClientTCP
+* TCP Chat
+* Date: 20/10/2020
+* @author: B3-10 / ESSAYED Sana, MATOKA Lea
+***/
 
 package TCP;
 

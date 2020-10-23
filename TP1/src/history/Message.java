@@ -1,3 +1,9 @@
+/***
+ * Message
+ * Date: 23/10/2020
+ * @author: B3-10 / ESSAYED Sana, MATOKA Lea
+ ***/
+
 package history;
 
 public class Message {
@@ -5,20 +11,27 @@ public class Message {
 	protected String user;
 	protected String message;
 	
-
-	// constructor Message
+	/**
+  	* constructor Message 
+	* @param user
+    * @param message
+    * 
+  	**/
 	public Message(String user, String message) {
 		this.user = user;
 		this.message = message;
 	}
 	
-	// method
-	// pour lire dans le fichier persistent
+	/**
+  	* constructor Message 
+	* @param line depuis fichier persistant
+  	**/
 	public Message(String line) {
 		String[] array = line.split("-#", 2);
 		this.user = array[0];
 		this.message = array[1];
 	}
+
 
 	// getter
 	// attribute user
@@ -32,8 +45,11 @@ public class Message {
 		return message;
 	}
 	
-	// method
-	// affichage d'un message côté client 
+
+	/**
+  	* constructor getMessage 
+	* affichage d'un message côté client
+  	**/
 	public String getMessage () {
 
 		int size = user.length();
@@ -46,8 +62,11 @@ public class Message {
 		return (" - "+user + spaces +" -> " + message);
 	}
 	
-	// method toString
-	// pour écrire dans le fichier persistant
+
+	/**
+  	* methode toString
+	* pour écriture dans le fichier persistant
+  	**/
 	public String toString () {
 		return (user+"-#"+message);
 	}	

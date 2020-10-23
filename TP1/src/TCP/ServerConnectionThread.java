@@ -1,9 +1,9 @@
 /***
- * ServerConnectionThread
- * Exemple serveur TCP
- * Date: 20/10/2020
- * @author: B3-10 / ESSAYED Sana, MATOKA Lea
- */
+* ServerConnectionThread
+* TCP Chat
+* Date: 20/10/2020
+* @author: B3-10 / ESSAYED Sana, MATOKA Lea
+*/
 
 package TCP;
 
@@ -14,7 +14,7 @@ import history.Message;
 
 public class ServerConnectionThread extends Thread {
 	
-	private Socket socket;
+	private Socket socket; // de connexion côté server
   private String pseudo;
 
   BufferedReader socIn;
@@ -64,7 +64,7 @@ public class ServerConnectionThread extends Thread {
 
   /**
   * methode run
-  * @param pseudo
+  * Gestion des messages entrés par un client
   **/
 	public void run() {
 
@@ -104,6 +104,8 @@ public class ServerConnectionThread extends Thread {
           } else if (pseudo != null) {
           
               Message msg = new Message(pseudo, line);
+
+              // envoi du message au server
               ServerTCP.diffuseMessage(msg);
             
           } else {

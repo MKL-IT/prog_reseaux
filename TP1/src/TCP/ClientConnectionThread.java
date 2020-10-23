@@ -1,9 +1,9 @@
 /***
- * ClientConnexionThread
- * Exemple serveur TCP
- * Date: 20/10/2020
- * @author: B3-10 / ESSAYED Sana, MATOKA Lea
- ***/
+* ClientConnexionThread
+* TCP Chat
+* Date: 20/10/2020
+* @author: B3-10 / ESSAYED Sana, MATOKA Lea
+***/
 
 
 package TCP;
@@ -44,6 +44,7 @@ public class ClientConnectionThread extends Thread {
 
   /**
   * methode run
+  * 
   **/
 	public void run() {
 

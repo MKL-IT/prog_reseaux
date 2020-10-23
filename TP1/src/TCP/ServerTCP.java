@@ -1,9 +1,9 @@
 /***
- * ServerTCP
- * Exemple serveur TCP
- * Date: 20/10/2020
- * @author: B3-10 / ESSAYED Sana, MATOKA Lea
- */
+* ServerTCP
+* TCP Chat
+* Date: 23/10/2020
+* @author: B3-10 / ESSAYED Sana, MATOKA Lea
+*/
 
 package TCP;
 
@@ -16,14 +16,21 @@ import history.*;
 
 public class ServerTCP  {
 	
+    // liste de clients ayant rejoint le chat : <pseudo, thread/connexion socket>
     private static HashMap<String, ServerConnectionThread> connections = new HashMap<String, ServerConnectionThread>();
 
+    // historique des messages
 	private static List<Message> msg_history = new ArrayList<Message>();
+
+    // Gstion du fichier historique
 	protected static PersistHistory persist = new PersistHistory("history");
   
  	/**
   	* main method ServerTCP 
 	* @param port 
+    * Gestion de nouvelle connexion client
+    *         de l'historique des messages
+    *         de la diffusion des messages à chaque client 
   	**/
     public static void main(String args[]){ 
 

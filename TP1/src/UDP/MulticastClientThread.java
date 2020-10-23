@@ -1,9 +1,9 @@
 /***
- * MulticastClientThread
- * Exemple serveur UDP
- * Date: 20/10/2020
- * @author: B3-10 / ESSAYED Sana, MATOKA Lea
- */
+* MulticastClientThread
+* UDP Chat
+* Date: 23/10/2020
+* @author: B3-10 / ESSAYED Sana, MATOKA Lea
+*/
 
 package UDP;
 
@@ -26,8 +26,8 @@ public class MulticastClientThread extends Thread {
 
 
  	/**
+  * methode run
   * reception d'un message et affichage sur le terminal
-  * @param clientSocket the client socket
   **/
 	public void run() {
   	  try {
