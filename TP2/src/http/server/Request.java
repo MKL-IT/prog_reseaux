@@ -1,5 +1,6 @@
 /***
  * Request
+ * Mini WebServer
  * Date: 20/10/2020
  * @author: B3-10 / ESSAYED Sana, MATOKA Lea
  ***/
@@ -82,8 +83,6 @@ public class Request {
                 header = header.substring((wordEnd + 2));
             }
         }
-         
-        // Body de la requête....
 
     }
 

@@ -1,5 +1,6 @@
 /***
  * WebServer
+ * Mini WebServer
  * Date: 20/10/2020
  * @author: B3-10 / ESSAYED Sana, MATOKA Lea
  ***/

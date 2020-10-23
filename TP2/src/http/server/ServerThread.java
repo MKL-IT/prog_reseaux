@@ -1,5 +1,6 @@
 /***
  * ServerThread
+ * Mini WebServer
  * Date: 20/10/2020
  * @author: B3-10 / ESSAYED Sana, MATOKA Lea
  ***/
@@ -122,7 +123,7 @@ public class ServerThread extends Thread {
             code = "200 OK";
             
         } catch (FileNotFoundException ex) {
-            System.err.println("Error in httpGET: " + ex);
+            System.err.println("Error in methodGET: " + ex);
             ex.printStackTrace();
             
             if(file.isFile()) {
@@ -132,7 +133,7 @@ public class ServerThread extends Thread {
             }
 
         } catch (IOException ex) {
-            System.err.println("Error in httpGET: " + ex);
+            System.err.println("Error in methodGET: " + ex);
             code = "404 Not Found";
             ex.printStackTrace();
         }
@@ -188,7 +189,7 @@ public class ServerThread extends Thread {
             //envoi de la réponse
             out.flush();
         } catch (IOException ex) {
-            System.err.println("Error in httpGET: " + ex);
+            System.err.println("Error in methodGET: " + ex);
             ex.printStackTrace();
         }
 
@@ -266,7 +267,7 @@ public class ServerThread extends Thread {
             out.write(makeHeader(code, type, length).getBytes());
             out.flush();
         } catch (IOException ex) {
-            System.err.println("Error in httpGET: " + ex);
+            System.err.println("Error in methodGET: " + ex);
             ex.printStackTrace();
         }
 
@@ -414,7 +415,7 @@ public class ServerThread extends Thread {
                   
             
         } catch (FileNotFoundException ex) {
-            System.err.println("Error in httpDELETE: " + ex);
+            System.err.println("Error in methodDELETE: " + ex);
             ex.printStackTrace();
             
             if(file.isFile()) {
@@ -426,7 +427,7 @@ public class ServerThread extends Thread {
             }
 
         } catch (IOException ex) {
-            System.err.println("Error in httpDELETE: " + ex);
+            System.err.println("Error in methodDELETE: " + ex);
             code = "404 Not Found";
             ex.printStackTrace();
         }
@@ -478,7 +479,7 @@ public class ServerThread extends Thread {
             out.flush();
 
         } catch (IOException ex) {
-            System.err.println("Error in httpDELETE: " + ex);
+            System.err.println("Error in methodDELETE: " + ex);
             ex.printStackTrace();
         }
 
