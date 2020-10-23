@@ -30,5 +30,5 @@ javac -d classes src/*/*/*.java
 
 
 //exe
-java -classpath classes http.server.WebServer
+java -classpath classes http.server.WebServer 5000
 
